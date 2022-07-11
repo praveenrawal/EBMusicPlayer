@@ -1,40 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/background_img">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:title="Capture My Emotion"
+        android:textSize="20sp"
+        app:titleTextColor="#FFF"
+        android:background="@color/purple_700"
+        android:id="@+id/main_txt"/>
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
         android:id="@+id/cam_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/main_fabs"
+        android:layout_below="@id/main_txt"
         android:adjustViewBounds="true"
+        android:background="@android:color/transparent"
         android:scaleType="centerCrop"
-        />
+        tools:ignore="ContentDescription"/>
 
-    <Button
-        android:id="@+id/capture"
+    <RelativeLayout
+        android:id="@+id/main_fabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Camera"/>
+        android:layout_alignParentBottom="true">
 
-    <Button
-        android:id="@+id/predict"
-        android:layout_width="match_parent"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/main_camfab"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="predict"
-        android:layout_marginTop="50dp"/>
+        android:layout_margin="5dp"
+        android:backgroundTint="@color/purple_700"
+        android:src="@drawable/camicon"
+        app:backgroundTint="@color/white"
+        android:layout_centerInParent="true"
+        app:fabSize="normal"
+        android:layout_centerVertical="true"
+        app:tint="@color/white"
+        tools:ignore="ContentDescription" />
 
-    <TextView
-        android:id="@+id/predictedTag"
-        android:layout_width="match_parent"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/main_gofab"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
-        android:text="predicted Tag"
-        android:paddingTop="200dp"
-        android:paddingLeft="50dp"/>
+        android:backgroundTint="@color/white"
+        android:text="sad songs"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/purple_700"
+        android:drawableEnd="@drawable/doneicon"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
 
-</LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

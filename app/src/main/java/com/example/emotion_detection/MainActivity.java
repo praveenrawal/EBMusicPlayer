@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.emotion_detection.ml.MobModel;
 import com.example.emotion_detection.ml.TfLiteModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -30,12 +31,13 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-Button capture, predict;
+FloatingActionButton camFab;
 ImageView camImg;
-TextView tag;
+
 private final int Camera_req_code = 100;
 
 Intent globalData;
@@ -47,44 +49,29 @@ int imageSize = 244;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        capture = findViewById(R.id.capture);
-        predict = findViewById(R.id.predict);
+        camFab = findViewById(R.id.main_camfab);
         camImg = findViewById(R.id.cam_image);
-        tag = findViewById(R.id.predictedTag);
 
 
-
-
-        capture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(new String[]{Manifest.permission.CAMERA}, Camera_req_code);
-                    }
+        camFab.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, Camera_req_code);
                 }
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, Camera_req_code);
             }
-        });
-
-        predict.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Bitmap img = (Bitmap) (globalData.getExtras().get("data"));
-                Bitmap image = Bitmap.createScaledBitmap(img, imageSize, imageSize, false);
-                classifyImage(image);
-            }
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, Camera_req_code);
         });
 
     }
     public void classifyImage(Bitmap image){
 
         try {
+/*
             int width = image.getWidth();
             int height = image.getHeight();
             Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+*/
 
             MobModel model = MobModel.newInstance(getApplicationContext());
 
@@ -110,7 +97,7 @@ int imageSize = 244;
             MobModel.Outputs outputs = model.process(inputFeature0);
             TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
             float[] confidence = outputFeature0.getFloatArray();
-            Log.i("Confidence",confidence.toString() + "Confidence Length " + confidence.length);
+            Log.i("Confidence", Arrays.toString(confidence) + "Confidence Length " + confidence.length);
 
             int maxPos = 0;
             float maxConfidence = 0;
@@ -123,15 +110,18 @@ int imageSize = 244;
                 }
             }
             String [] classes = {"angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"};
-            tag.setText(classes[maxPos]);
+//            tag.setText(classes[maxPos]);
 
 //            System.out.println(classes[maxPos]);
 
             // Releases model resources if no longer used.
             model.close();
+            startActivity(new Intent(MainActivity.this, MusicListActivity.class).putExtra("emotion",classes[maxPos]));
+
+
         } catch (IOException e) {
             // TODO Handle the exception
-            Toast.makeText(this,"not predicted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"not predicted, Try once again", Toast.LENGTH_SHORT).show();
 
         }
 
@@ -148,7 +138,12 @@ int imageSize = 244;
                 Bitmap img = (Bitmap) (data.getExtras().get("data"));
                 camImg.setImageBitmap(img);
                 globalData = data;
+
+//                Bitmap img = (Bitmap) (globalData.getExtras().get("data"));
+                Bitmap image = Bitmap.createScaledBitmap(img, imageSize, imageSize, false);
+                classifyImage(image);
             }
+
         }
     }
 }
